@@ -3,6 +3,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from repository.user import UserRepository
 from auth.hashing import AuthHandler
+from auth.auth import OAuth2
 from schemas.user import UserCreate, LoginRequest
 import re
 
@@ -66,5 +67,5 @@ def login_user_service(db: Session, user: LoginRequest):
             detail="Usuário ou senha incorreta!"
         )
     
-    return AuthHandler.user_login(user_db)
+    return OAuth2.user_login(user_db)
                 
