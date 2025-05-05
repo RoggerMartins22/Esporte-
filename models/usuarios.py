@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, String, DateTime, Enum as SQLEnum
-from sqlalchemy.ext.declarative import declarative_base
+from database import Base
 from datetime import datetime, timedelta
 from schemas.usuarios import StatusEnum, PermissaoEnum
 
-Base = declarative_base()
+
 
 class User(Base):
     __tablename__ = 'users'
