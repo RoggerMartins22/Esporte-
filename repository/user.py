@@ -6,7 +6,7 @@ from schemas.user import UserCreate
 class UserRepository:
     @staticmethod
     def create_user_repository(db: Session, user: UserCreate):
-        db_user = User(email=user.email, nome=user.nome, senha=user.senha)
+        db_user = User(email=user.email, cpf=user.cpf, nome=user.nome, senha=user.senha)
         
         try:
             db.add(db_user)
@@ -20,3 +20,7 @@ class UserRepository:
     @staticmethod
     def get_user_by_email(db: Session, email: str):
         return db.query(User).filter(User.email == email).first()
+    
+    @staticmethod
+    def get_user_by_cpf(db: Session, cpf: str):
+        return db.query(User).filter(User.cpf == cpf).first()

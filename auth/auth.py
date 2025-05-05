@@ -4,7 +4,9 @@ from datetime import datetime, timedelta
 from schemas.user import UserBase
 from fastapi import HTTPException, status
 from jose import jwt, JWTError
+from dotenv import load_dotenv
 import os
+load_dotenv()  
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")

@@ -22,6 +22,12 @@ def validate_user_info(user):
             detail="E-mail inválido."
         )
     
+    if not re.match(r"^\d{11}$", user.cpf):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="CPF inválido. Deve conter exatamente 11 números, sem pontos ou traços."
+        )
+    
     if not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$", user.senha):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -38,17 +44,30 @@ def create_user_service(db: Session, user: UserCreate):
 
     user.senha = AuthHandler.hash_password(user.senha)
             
+    if UserRepository.get_user_by_email(db, user.email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Já existe um usuário com este e-mail cadastrado."
+        )
+
+    if UserRepository.get_user_by_cpf(db, user.cpf):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Já existe um usuário com este CPF cadastrado."
+        )
+
     try:
-       if UserRepository.create_user_repository(db=db, user=user):
+        result = UserRepository.create_user_repository(db=db, user=user)
+        if result:
             return {
                 "status_code": status.HTTP_201_CREATED,
                 "detail": "Usuário cadastrado com sucesso!"
             }
-       
-    except IntegrityError:
+
+    except IntegrityError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Já existe um usuário com este e-mail cadastrado."
+            detail=str(e) 
         )
 
         
