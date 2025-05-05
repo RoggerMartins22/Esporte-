@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Enum as SQLEnum
-from database import Base
+from database.base import Base
 from schemas.quadras import DisponivelEnum
 
 class Quadra(Base):
@@ -10,4 +10,4 @@ class Quadra(Base):
     endereco = Column(String, nullable=False)
     esporte = Column(String, nullable=False)
     descricao = Column(String, nullable=True)
-    disponibilidade = Column(SQLEnum(DisponivelEnum), default=DisponivelEnum.A,nullable=False)
+    disponibilidade = Column(SQLEnum(DisponivelEnum), default=DisponivelEnum.S,nullable=False)

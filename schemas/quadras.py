@@ -7,11 +7,10 @@ class DisponivelEnum(str, Enum):
     N = "N"
 
 class QuadraBase(BaseModel):
-    NOME_QUADRA: str
-    ENDERECO: str
-    ESPORTE: str
-    DESCRICAO: Optional[str] = None
-    DISPONIVEL: DisponivelEnum
+    nome_quadra: str
+    endereco: str
+    esporte: str
+    descricao: Optional[str] = None
 
     class Config:
         orm_mode = True
