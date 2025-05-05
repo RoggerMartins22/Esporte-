@@ -1,9 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, Enum as SQLEnum
-from database import Base
+from database.base import Base
 from datetime import datetime, timedelta
 from schemas.usuarios import StatusEnum, PermissaoEnum
-
-
 
 class User(Base):
     __tablename__ = 'users'

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from services.usuarios import (create_user_service, login_user_service)
 from auth.auth import token_verifier
 from schemas.usuarios import UserCreate, LoginRequest
-from database import get_db
+from database.database import get_db
 
 router = APIRouter(
     prefix="/usuario",
