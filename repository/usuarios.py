@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from models.user import User
-from schemas.user import UserCreate
+from models.usuarios import User
+from schemas.usuarios import UserCreate
 
 class UserRepository:
     @staticmethod

@@ -1,7 +1,7 @@
 from fastapi.security import HTTPBearer
 from fastapi import Depends
 from datetime import datetime, timedelta
-from schemas.user import UserBase
+from schemas.usuarios import UserBase
 from fastapi import HTTPException, status
 from jose import jwt, JWTError
 from dotenv import load_dotenv

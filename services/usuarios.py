@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
-from repository.user import UserRepository
+from repository.usuarios import UserRepository
 from auth.hashing import AuthHandler
 from auth.auth import OAuth2
-from schemas.user import UserCreate, LoginRequest
+from schemas.usuarios import UserCreate, LoginRequest
 import re
 
 
