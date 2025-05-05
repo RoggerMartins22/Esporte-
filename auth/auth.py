@@ -1,4 +1,4 @@
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer
 from fastapi import Depends
 from database import get_db
 from sqlalchemy.orm import Session
@@ -11,10 +11,8 @@ import os
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 
-oauth_scheme = OAuth2PasswordBearer(tokenUrl='/user/login')
-
-def token_verifier(token = Depends(oauth_scheme)):
-    OAuth2.verify_token(access_token=token)
+def token_verifier(token = Depends(HTTPBearer())):
+    OAuth2.verify_token(access_token=token.credentials)
 
 class OAuth2:
     @staticmethod
