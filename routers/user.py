@@ -16,8 +16,6 @@ test = APIRouter(
     dependencies=[Depends(token_verifier)]
 )
 
-
-
 @router.post("/cadastrar")
 async def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return create_user_service(db=db, user=user)
@@ -30,7 +28,6 @@ async def login_user(request_form_user: OAuth2PasswordRequestForm = Depends(), d
     )
 
     return login_user_service(db=db, user=user)
-
 
 @test.get('/')
 def test_user_verify():
