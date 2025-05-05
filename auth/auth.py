@@ -1,7 +1,5 @@
 from fastapi.security import HTTPBearer
 from fastapi import Depends
-from database import get_db
-from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from schemas.user import UserBase
 from fastapi import HTTPException, status
