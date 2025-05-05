@@ -1,6 +1,4 @@
-from pydantic import BaseModel, validator
-import re
-from fastapi import HTTPException, status
+from pydantic import BaseModel
 
 class UserBase(BaseModel):
     nome: str
