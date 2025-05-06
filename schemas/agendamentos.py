@@ -19,6 +19,13 @@ class AgendamentoBase(BaseModel):
 class AgendamentoCreate(AgendamentoBase):
     pass
 
+class AgendamentoDetalhadoResponse(BaseModel):
+    nome_quadra: str
+    nome_usuario: str
+    data: date
+    horario_inicio: time
+    horario_fim: time
+
 
 class AgendamentoResponse(AgendamentoBase):
     id_agendamento: int

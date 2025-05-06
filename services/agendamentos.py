@@ -57,3 +57,53 @@ class AgendamentoService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Erro ao criar agendamento: " + str(e)
             )
+        
+    @staticmethod
+    def listar_agendamentos(db: Session):
+        try:
+            agendamentos = AgendamentoRepository.get_agendamentos(db=db)
+            if not agendamentos:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Nenhum agendamento encontrado."
+                )
+            return agendamentos
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Erro ao listar agendamentos: " + str(e)
+            )
+        
+    @staticmethod
+    def listar_agendamentos_por_id_quadra(db: Session, id_quadra: int):
+        try:
+            agendamentos = AgendamentoRepository.get_agendamento_by_id_quadra(db=db, id_quadra=id_quadra)
+            if not agendamentos:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Nenhum agendamento encontrado para essa quadra."
+                )
+            return agendamentos
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Erro ao listar agendamentos: " + str(e)
+            )
+        
+    @staticmethod
+    def listar_agendamentos_por_id_usuario(db: Session, id_usuario: int):
+        try:
+            agendamentos = AgendamentoRepository.get_agendamento_by_id_usuario(db=db, id_usuario=id_usuario)
+            if not agendamentos:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Nenhum agendamento encontrado para esse usuário."
+                )
+            return agendamentos
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Erro ao listar agendamentos: " + str(e)
+            )

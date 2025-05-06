@@ -1,7 +1,10 @@
 from sqlalchemy.orm import Session
+from typing import Optional, List
 from sqlalchemy.exc import IntegrityError
 from models.agendamentos import Agendamento
-from schemas.agendamentos import AgendamentoCreate
+from models.quadras import Quadra
+from models.usuarios import User
+from schemas.agendamentos import AgendamentoCreate, AgendamentoDetalhadoResponse
 
 
 class AgendamentoRepository:
@@ -34,3 +37,45 @@ class AgendamentoRepository:
             Agendamento.horario_fim >= agendamento.horario_fim,
             Agendamento.id_quadra == agendamento.id_quadra
         ).first()
+    
+    @staticmethod
+    def get_agendamentos(
+        db: Session,
+        id_quadra: Optional[int] = None,
+        id_usuario: Optional[int] = None
+    ) -> List[AgendamentoDetalhadoResponse]:
+        query = db.query(
+            Quadra.nome_quadra.label("nome_quadra"),
+            User.nome.label("nome_usuario"),
+            Agendamento.data,
+            Agendamento.horario_inicio,
+            Agendamento.horario_fim
+        ).join(
+            Quadra, Agendamento.id_quadra == Quadra.id
+        ).join(
+            User, Agendamento.id_usuario == User.id
+        )
+
+        if id_quadra:
+            query = query.filter(Agendamento.id_quadra == id_quadra)
+
+        if id_usuario:
+            query = query.filter(Agendamento.id_usuario == id_usuario)
+
+        result = query.all()
+
+        return [AgendamentoDetalhadoResponse(
+            nome_quadra=row[0],
+            nome_usuario=row[1],
+            data=row[2],
+            horario_inicio=row[3],
+            horario_fim=row[4]
+        ) for row in result]
+    
+    @staticmethod
+    def get_agendamento_by_id_quadra(db: Session, id_quadra: int):
+        return AgendamentoRepository.get_agendamentos(db, id_quadra=id_quadra)
+    
+    @staticmethod
+    def get_agendamento_by_id_usuario(db: Session, id_usuario: int):
+            return AgendamentoRepository.get_agendamentos(db, id_usuario=id_usuario)
