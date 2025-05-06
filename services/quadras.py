@@ -28,7 +28,7 @@ def create_quadrant_service(db: Session, quadra: QuadraCreate):
             detail="Já existe uma quadra com esse nome."
         )
 
-    if QuadrantRepository.check_unique_address(db, quadra.endereco):
+    if QuadrantRepository.get_quadrant_by_address(db, quadra.endereco):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Já existe uma quadra cadastrada nesse endereço."
