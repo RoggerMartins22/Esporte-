@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, Enum as SQLEnum
+from sqlalchemy.orm import relationship
 from database.base import Base
 from datetime import datetime, timedelta
 from schemas.usuarios import StatusEnum, PermissaoEnum
@@ -14,3 +15,5 @@ class User(Base):
     status = Column(SQLEnum(StatusEnum), default=StatusEnum.A, nullable=False)
     permissao = Column(SQLEnum(PermissaoEnum), default=PermissaoEnum.USER, nullable=False)
     data_cadastro = Column(DateTime, default=lambda: datetime.now() - timedelta(hours=3))
+
+    agendamentos = relationship("Agendamento", back_populates="pessoa")
