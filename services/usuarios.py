@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from repository.usuarios import UserRepository
 from auth.hashing import AuthHandler
 from auth.auth import OAuth2
-from schemas.usuarios import UserCreate, LoginRequest
+from schemas.usuarios import UserCreate, LoginRequest, ResetPasswordRequest
 import re
 
 
@@ -76,15 +76,48 @@ def login_user_service(db: Session, user: LoginRequest):
 
     if not user_db:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Usuário ou senha incorreta!"
         )
     
     if not AuthHandler.verify_password(user.senha, user_db.senha):
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Usuário ou senha incorreta!"
         )
     
     return OAuth2.user_login(user_db)
                 
+
+def reset_password_service(db: Session, user: ResetPasswordRequest):
+
+    user_db = UserRepository.get_user_by_email(db=db, email=user.email)
+                                               
+    if not user_db:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuário não encontrado!"
+        )
+
+    if not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$", user.nova_senha):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                "Senha inválida. A senha deve ter no mínimo 8 caracteres, "
+                "incluir pelo menos 1 letra maiúscula, 1 letra minúscula e 1 número."
+            )
+        )
+    
+    user.nova_senha = AuthHandler.hash_password(user.nova_senha)
+
+    try:
+        UserRepository.update_user_password(db=db, user=user)
+        return {
+            "status_code": status.HTTP_200_OK,
+            "detail": "Senha redefinida com sucesso!"
+        }
+    except IntegrityError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )

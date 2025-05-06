@@ -21,6 +21,10 @@ class LoginRequest(BaseModel):
     email: str
     senha: str
     
+class ResetPasswordRequest(BaseModel):
+    email: str
+    nova_senha: str
+
 class UserOut(UserBase):
     id: int
 

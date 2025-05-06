@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from models.usuarios import User
-from schemas.usuarios import UserCreate
+from schemas.usuarios import UserCreate, ResetPasswordRequest
 
 class UserRepository:
     @staticmethod
@@ -24,3 +24,17 @@ class UserRepository:
     @staticmethod
     def get_user_by_cpf(db: Session, cpf: str):
         return db.query(User).filter(User.cpf == cpf).first()
+    
+    @staticmethod
+    def update_user_password(db: Session, user: ResetPasswordRequest):
+
+        db_user = UserRepository.get_user_by_email(db, email=user.email)
+
+        try:
+            db_user.senha = user.nova_senha
+            db.commit()
+            db.refresh(db_user)
+            return db_user
+        except IntegrityError as e:
+            db.rollback()
+            raise e
