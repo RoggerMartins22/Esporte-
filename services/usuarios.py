@@ -72,18 +72,18 @@ def create_user_service(db: Session, user: UserCreate):
 
         
 def login_user_service(db: Session, user: LoginRequest):
-    user_db = UserRepository.get_user_by_email(db=db, email=user.email)
+    user_db = UserRepository.get_user_by_cpf(db=db, cpf=user.cpf)
 
     if not user_db:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Usuário ou senha incorreta!"
+            detail="CPF ou senha incorreta!"
         )
     
     if not AuthHandler.verify_password(user.senha, user_db.senha):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Usuário ou senha incorreta!"
+            detail="CPF ou senha incorreta!"
         )
     
     return OAuth2.user_login(user_db)
@@ -91,7 +91,7 @@ def login_user_service(db: Session, user: LoginRequest):
 
 def reset_password_service(db: Session, user: ResetPasswordRequest):
 
-    user_db = UserRepository.get_user_by_email(db=db, email=user.email)
+    user_db = UserRepository.get_user_by_cpf(db=db, cpf=user.cpf)
                                                
     if not user_db:
         raise HTTPException(
