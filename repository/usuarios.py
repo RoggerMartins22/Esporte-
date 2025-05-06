@@ -38,3 +38,8 @@ class UserRepository:
         except IntegrityError as e:
             db.rollback()
             raise e
+    
+    @staticmethod
+    def get_usuario_by_id(db: Session, usuario_id: int):
+        return db.query(User).filter(User.id == usuario_id).first()
+    
