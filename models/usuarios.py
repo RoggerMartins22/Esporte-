@@ -16,4 +16,4 @@ class User(Base):
     permissao = Column(SQLEnum(PermissaoEnum), default=PermissaoEnum.USER, nullable=False)
     data_cadastro = Column(DateTime, default=lambda: datetime.now() - timedelta(hours=3))
 
-    agendamentos = relationship("Agendamento", back_populates="pessoa")
+    agendamentos = relationship("Agendamento", back_populates="users")

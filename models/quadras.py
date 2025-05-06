@@ -13,4 +13,4 @@ class Quadra(Base):
     descricao = Column(String, nullable=True)
     disponibilidade = Column(SQLEnum(DisponivelEnum), default=DisponivelEnum.S,nullable=False)
 
-    agendamentos = relationship("Agendamento", back_populates="quadra")
+    agendamentos = relationship("Agendamento", back_populates="quadras")

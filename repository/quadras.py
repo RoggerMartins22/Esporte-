@@ -22,5 +22,9 @@ class QuadrantRepository:
         return db.query(Quadra).filter(Quadra.nome_quadra == nome_quadra).first()
     
     @staticmethod 
-    def check_unique_address(db: Session, endereco: str):
+    def get_quadrant_by_address(db: Session, endereco: str):
         return db.query(Quadra).filter(Quadra.endereco == endereco).first()
+    
+    @staticmethod 
+    def get_quadrant_by_id(db: Session, quadra_id: int):
+        return db.query(Quadra).filter(Quadra.id == quadra_id).first()

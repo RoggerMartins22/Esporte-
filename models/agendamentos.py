@@ -16,5 +16,5 @@ class Agendamento(Base):
 
     status = Column(Enum(AgendamentoStatus), default=AgendamentoStatus.confirmado, nullable=False)
 
-    quadra = relationship("quadras", back_populates="agendamentos")
-    pessoa = relationship("users", back_populates="agendamentos")
+    quadras = relationship("Quadra", back_populates="agendamentos")
+    users = relationship("User", back_populates="agendamentos")

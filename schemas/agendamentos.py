@@ -11,7 +11,7 @@ class AgendamentoStatus(str, Enum):
 
 class AgendamentoBase(BaseModel):
     id_quadra: int
-    id_pessoa: int
+    id_usuario: int
     data: date
     horario_inicio: time
     horario_fim: time
