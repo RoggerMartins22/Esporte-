@@ -18,11 +18,11 @@ class UserCreate(UserBase):
     senha: str
 
 class LoginRequest(BaseModel):
-    email: str
+    cpf: str
     senha: str
     
 class ResetPasswordRequest(BaseModel):
-    email: str
+    cpf: str
     nova_senha: str
 
 class UserOut(UserBase):

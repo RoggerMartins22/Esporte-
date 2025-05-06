@@ -23,7 +23,7 @@ async def create_user(user: UserCreate, db: Session = Depends(get_db)):
 @router.post("/login")
 async def login_user(request_form_user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = LoginRequest(
-        email=request_form_user.username,
+        cpf=request_form_user.username,
         senha=request_form_user.password
     )
 

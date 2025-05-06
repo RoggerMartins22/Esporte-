@@ -21,7 +21,7 @@ class OAuth2:
             exp = datetime.utcnow() + timedelta(minutes=expires_in)
             
             payload = {
-                'sub': user.email,
+                'sub': user.cpf,
                 'exp': exp
             }
 

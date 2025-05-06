@@ -28,7 +28,7 @@ class UserRepository:
     @staticmethod
     def update_user_password(db: Session, user: ResetPasswordRequest):
 
-        db_user = UserRepository.get_user_by_email(db, email=user.email)
+        db_user = UserRepository.get_user_by_cpf(db, cpf=user.cpf)
 
         try:
             db_user.senha = user.nova_senha
