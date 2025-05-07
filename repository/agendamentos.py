@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from models.agendamentos import Agendamento
 from models.quadras import Quadra
 from models.usuarios import User
-from schemas.agendamentos import AgendamentoCreate, AgendamentoDetalhadoResponse
+from schemas.agendamentos import AgendamentoCreate, AgendamentoDetalhadoResponse, AgendamentoStatus
 
 
 class AgendamentoRepository:
@@ -28,14 +28,24 @@ class AgendamentoRepository:
         except IntegrityError as e:
             db.rollback()
             raise e
-        
+    
+    @staticmethod
+    def cancelar_agendamento(db: Session, id_agendamento: int):
+        agendamento = db.query(Agendamento).filter(Agendamento.id_agendamento == id_agendamento).first()
+        if agendamento:
+            agendamento.status = AgendamentoStatus.cancelado
+            db.commit()
+            db.refresh(agendamento)
+        return agendamento
+
     @staticmethod
     def get_agendamento_by_data_hora(db: Session, agendamento):
         return db.query(Agendamento).filter(
             Agendamento.data == agendamento.data,
             Agendamento.horario_inicio <= agendamento.horario_inicio,
             Agendamento.horario_fim >= agendamento.horario_fim,
-            Agendamento.id_quadra == agendamento.id_quadra
+            Agendamento.id_quadra == agendamento.id_quadra,
+            Agendamento.status == AgendamentoStatus.confirmado
         ).first()
     
     @staticmethod
@@ -68,6 +78,10 @@ class AgendamentoRepository:
             horario_fim=row[4]
         ) for row in result]
     
+    @staticmethod
+    def get_agendamento_by_id(db: Session, id_agendamento: int):
+        return db.query(Agendamento).filter(Agendamento.id_agendamento == id_agendamento).first()
+
     @staticmethod
     def get_agendamento_by_id_quadra(db: Session, id_quadra: int):
         return AgendamentoRepository.get_agendamentos(db, id_quadra=id_quadra)

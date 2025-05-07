@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
+from schemas.agendamentos import AgendamentoStatus
 from repository.quadras import QuadrantRepository
 from repository.usuarios import UserRepository
 from repository.agendamentos import AgendamentoRepository
@@ -160,4 +161,49 @@ class AgendamentoService:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Erro ao listar agendamentos: " + str(e)
+            )
+        
+    @staticmethod
+    def cancelar_agendamento(db: Session, id_agendamento: int, user_id: int):
+        try:
+            user = UserRepository.get_role_user(db=db, id_usuario=user_id)
+            agendamento = AgendamentoRepository.get_agendamento_by_id(db=db, id_agendamento=id_agendamento)
+            
+            if not agendamento:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Agendamento não encontrado."
+                )
+
+            if agendamento.id_usuario != user_id and user.permissao != "ADM":
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Você não tem permissão para cancelar este agendamento!"
+                )
+            
+            if agendamento.status == AgendamentoStatus.cancelado:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Agendamento já cancelado!"
+                )
+            
+            if agendamento.status == AgendamentoStatus.concluido:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Não é possível cancelar um Agendamento já concluído!"
+                )
+
+            if AgendamentoRepository.cancelar_agendamento(db=db, id_agendamento=id_agendamento):
+
+                return {
+                    "status_code": status.HTTP_200_OK,
+                    "detail": "Agendamento cancelado com sucesso!"
+                }
+            
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Erro ao cancelar agendamento: " + str(e)
             )
