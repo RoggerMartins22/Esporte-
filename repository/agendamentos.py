@@ -79,3 +79,7 @@ class AgendamentoRepository:
     @staticmethod
     def get_agendamento_by_id_usuario(db: Session, id_usuario: int):
             return AgendamentoRepository.get_agendamentos(db, id_usuario=id_usuario)
+    
+    @staticmethod
+    def get_agendamento_by_id_and_status(db: Session, id_usuario: int, status):
+       return db.query(Agendamento).filter(Agendamento.id_usuario == id_usuario, Agendamento.status == status).all()
