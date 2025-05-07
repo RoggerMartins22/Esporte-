@@ -1,5 +1,10 @@
 FROM python:3.10-slim
 
+RUN apt-get update && apt-get install -y tzdata
+
+RUN ln -fs /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime && \
+    dpkg-reconfigure --frontend noninteractive tzdata
+
 WORKDIR /app
 
 COPY requirements.txt /app/
