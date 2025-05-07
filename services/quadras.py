@@ -3,6 +3,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from schemas.quadras import QuadraCreate
 from repository.quadras import QuadrantRepository
+from repository.usuarios import UserRepository
 import re
 
 
@@ -20,8 +21,16 @@ def validate_quadrant_info(quadra):
         )
 
 
-def create_quadrant_service(db: Session, quadra: QuadraCreate):
+def create_quadrant_service(db: Session, quadra: QuadraCreate, user_id: int):
 
+    user = UserRepository.get_role_user(db=db, id_usuario=user_id)
+    
+    if user.permissao == "USER":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Você não permissão para acessar este menu!"
+        )
+    
     if QuadrantRepository.get_quadrant_by_name(db, quadra.nome_quadra):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -35,13 +44,17 @@ def create_quadrant_service(db: Session, quadra: QuadraCreate):
         )
     
     try:
+       
         result = QuadrantRepository.create_quadrant_repository(db=db, quadra=quadra)
+
         if result:
             return {
                 "status_code": status.HTTP_201_CREATED,
                 "detail": "Quadra cadastrada com sucesso!"
             }
 
+    except HTTPException:
+            raise
     except IntegrityError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
