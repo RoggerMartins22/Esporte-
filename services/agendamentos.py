@@ -4,6 +4,8 @@ from sqlalchemy.exc import IntegrityError
 from repository.quadras import QuadrantRepository
 from repository.usuarios import UserRepository
 from repository.agendamentos import AgendamentoRepository
+from datetime import datetime
+now = datetime.now()
 
 
 class AgendamentoService:
@@ -27,12 +29,31 @@ class AgendamentoService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Já existe um agendamento para essa quadra nesse horário."
             )  
+    
+        if AgendamentoRepository.get_agendamento_by_id_and_status(db, agendamento.id_usuario, status="confirmado"):
+                raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Usuário já possui um agendamento em aberto!"
+            )
         
         if agendamento.horario_inicio.hour < 8 or agendamento.horario_fim.hour > 22:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Horário inválido. O agendamento deve ser entre 08:00 e 22:00."
             ) 
+
+        if (agendamento.horario_fim.hour - agendamento.horario_inicio.hour) < 1:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Horário inválido. O agendamento deve ser no minímo 1 hora!."
+            ) 
+        
+        horario_inicio = datetime.combine(now.date(), agendamento.horario_inicio)
+        if agendamento.data == now.date() and horario_inicio <= now:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Não é possível agendar para um horário que já passou no mesmo dia."
+            )
 
     @staticmethod
     def criar_agendamento(db: Session, agendamento): 
