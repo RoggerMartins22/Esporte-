@@ -43,3 +43,6 @@ class UserRepository:
     def get_usuario_by_id(db: Session, usuario_id: int):
         return db.query(User).filter(User.id == usuario_id).first()
     
+    @staticmethod
+    def get_role_user(db: Session, id_usuario: int):
+        return db.query(User).filter(User.id == id_usuario).first()

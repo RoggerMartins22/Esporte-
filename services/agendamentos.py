@@ -80,15 +80,24 @@ class AgendamentoService:
             )
         
     @staticmethod
-    def listar_agendamentos(db: Session):
+    def listar_agendamentos(db: Session, user_id: int):
         try:
-            agendamentos = AgendamentoRepository.get_agendamentos(db=db)
+            user = UserRepository.get_role_user(db=db, id_usuario=user_id)
+            
+            if user.permissao == "ADM":
+                agendamentos = AgendamentoRepository.get_agendamentos(db=db)
+            
+            else:
+                agendamentos = AgendamentoRepository.get_agendamento_user(db=db, id_usuario=user.id)
+
             if not agendamentos:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail="Nenhum agendamento encontrado."
                 )
             return agendamentos
+        except HTTPException:
+            raise
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -96,15 +105,28 @@ class AgendamentoService:
             )
         
     @staticmethod
-    def listar_agendamentos_por_id_quadra(db: Session, id_quadra: int):
+    def listar_agendamentos_por_id_quadra(db: Session, id_quadra: int, user_id: int):
         try:
-            agendamentos = AgendamentoRepository.get_agendamento_by_id_quadra(db=db, id_quadra=id_quadra)
+
+            user = UserRepository.get_role_user(db=db, id_usuario=user_id)
+            
+            if user.permissao == "ADM":
+                agendamentos = AgendamentoRepository.get_agendamento_by_id_quadra(db=db, id_quadra=id_quadra)
+            
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Você não permissão para acessar este menu!"
+                )
+
             if not agendamentos:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail="Nenhum agendamento encontrado para essa quadra."
                 )
             return agendamentos
+        except HTTPException:
+            raise
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -112,15 +134,26 @@ class AgendamentoService:
             )
         
     @staticmethod
-    def listar_agendamentos_por_id_usuario(db: Session, id_usuario: int):
+    def listar_agendamentos_por_id_usuario(db: Session, id_usuario: int, user_id: int):
         try:
-            agendamentos = AgendamentoRepository.get_agendamento_by_id_usuario(db=db, id_usuario=id_usuario)
+            user = UserRepository.get_role_user(db=db, id_usuario=user_id)
+            
+            if user.permissao == "ADM":
+                agendamentos = AgendamentoRepository.get_agendamento_by_id_usuario(db=db, id_usuario=id_usuario)
+            
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Você não permissão para acessar este menu!"
+                )
+
             if not agendamentos:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail="Nenhum agendamento encontrado para esse usuário."
                 )
             return agendamentos
+        
         except HTTPException:
             raise
         except Exception as e:

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from auth.auth import token_verifier
+from auth.auth import token_verifier, get_current_user_id
 from database.database import get_db
 from schemas.agendamentos import AgendamentoCreate
 from services.agendamentos import AgendamentoService
@@ -16,13 +16,13 @@ async def criar_agendamento(agendamento: AgendamentoCreate, db: Session = Depend
     return AgendamentoService.criar_agendamento(db=db, agendamento=agendamento)
 
 @router.get("/")
-def listar_agendamentos(db: Session = Depends(get_db)):
-    return AgendamentoService.listar_agendamentos(db=db)
+def listar_agendamentos(db: Session = Depends(get_db), user_id = Depends(get_current_user_id)):
+    return AgendamentoService.listar_agendamentos(db=db, user_id=user_id)
 
 @router.get("/quadra/{id_quadra}")
-def listar_agendamentos_por_id_quadra(id_quadra: int, db: Session = Depends(get_db)):
-    return AgendamentoService.listar_agendamentos_por_id_quadra(db=db, id_quadra=id_quadra)
+def listar_agendamentos_por_id_quadra(id_quadra: int, db: Session = Depends(get_db), user_id = Depends(get_current_user_id)):
+    return AgendamentoService.listar_agendamentos_por_id_quadra(db=db, id_quadra=id_quadra, user_id=user_id)
 
 @router.get("/usuario/{id_usuario}")
-def listar_agendamentos_por_id_usuario(id_usuario: int, db: Session = Depends(get_db)):
-    return AgendamentoService.listar_agendamentos_por_id_usuario(db=db, id_usuario=id_usuario)
+def listar_agendamentos_por_id_usuario(id_usuario: int, db: Session = Depends(get_db), user_id = Depends(get_current_user_id)):
+    return AgendamentoService.listar_agendamentos_por_id_usuario(db=db, id_usuario=id_usuario, user_id=user_id)

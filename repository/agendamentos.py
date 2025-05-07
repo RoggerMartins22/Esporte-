@@ -39,11 +39,7 @@ class AgendamentoRepository:
         ).first()
     
     @staticmethod
-    def get_agendamentos(
-        db: Session,
-        id_quadra: Optional[int] = None,
-        id_usuario: Optional[int] = None
-    ) -> List[AgendamentoDetalhadoResponse]:
+    def get_agendamentos(db: Session, id_quadra: Optional[int] = None, id_usuario: Optional[int] = None) -> List[AgendamentoDetalhadoResponse]:
         query = db.query(
             Quadra.nome_quadra.label("nome_quadra"),
             User.nome.label("nome_usuario"),
@@ -83,3 +79,15 @@ class AgendamentoRepository:
     @staticmethod
     def get_agendamento_by_id_and_status(db: Session, id_usuario: int, status):
        return db.query(Agendamento).filter(Agendamento.id_usuario == id_usuario, Agendamento.status == status).all()
+    
+    @staticmethod
+    def get_agendamento_user(db: Session, id_usuario: int):
+        query = db.query(Agendamento).filter(Agendamento.id_usuario == id_usuario).all()
+        
+        return [AgendamentoDetalhadoResponse(
+            nome_quadra=row[0],
+            nome_usuario=row[1],
+            data=row[2],
+            horario_inicio=row[3],
+            horario_fim=row[4]
+        ) for row in query]

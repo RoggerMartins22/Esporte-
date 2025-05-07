@@ -14,6 +14,16 @@ ALGORITHM = os.getenv("ALGORITHM")
 def token_verifier(token = Depends(HTTPBearer())):
     OAuth2.verify_token(access_token=token.credentials)
 
+def get_current_user_id(token = Depends(HTTPBearer())) -> int:
+    payload = OAuth2.verify_token(token.credentials)
+    user_id = int(payload.get("sub"))
+    if user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido: ID não encontrado.",
+        )
+    return int(user_id)
+
 class OAuth2:
     @staticmethod
     def user_login(user: UserBase, expires_in: int = 30):
@@ -21,7 +31,7 @@ class OAuth2:
             exp = datetime.utcnow() + timedelta(minutes=expires_in)
             
             payload = {
-                'sub': user.cpf,
+                'sub': str(user.id),
                 'exp': exp
             }
 
@@ -37,6 +47,7 @@ class OAuth2:
     def verify_token(access_token):
         try:
             data = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
+            return data
         except JWTError:
             raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
