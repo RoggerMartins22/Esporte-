@@ -10,11 +10,6 @@ router = APIRouter(
     prefix="/usuario",
     tags=["users"],
 )
-test = APIRouter(
-    prefix="/test",
-    tags=["test"],
-    dependencies=[Depends(token_verifier)]
-)
 
 @router.post("/cadastrar")
 async def create_user(user: UserCreate, db: Session = Depends(get_db)):
@@ -32,7 +27,3 @@ async def login_user(request_form_user: OAuth2PasswordRequestForm = Depends(), d
 @router.post("/redefinir-senha")
 async def reset_password(user: ResetPasswordRequest, db: Session = Depends(get_db)):
     return reset_password_service(db=db, user=user)
-
-@test.get('/')
-def test_user_verify():
-    return 'Está ok'
