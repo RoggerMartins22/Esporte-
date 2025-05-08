@@ -12,8 +12,8 @@ router = APIRouter(
 )
 
 @router.post("/agendar-quadra")
-async def criar_agendamento(agendamento: AgendamentoCreate, db: Session = Depends(get_db)):
-    return AgendamentoService.criar_agendamento(db=db, agendamento=agendamento)
+async def criar_agendamento(agendamento: AgendamentoCreate, db: Session = Depends(get_db), user_id = Depends(get_current_user_id)):
+    return AgendamentoService.criar_agendamento(db=db, agendamento=agendamento, user_id=user_id)
 
 @router.get("/")
 def listar_agendamentos(db: Session = Depends(get_db), user_id = Depends(get_current_user_id)):

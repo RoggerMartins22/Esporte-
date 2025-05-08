@@ -96,7 +96,19 @@ class AgendamentoRepository:
     
     @staticmethod
     def get_agendamento_user(db: Session, id_usuario: int):
-        query = db.query(Agendamento).filter(Agendamento.id_usuario == id_usuario).all()
+        query = db.query(
+            Quadra.nome_quadra.label("nome_quadra"),
+            User.nome.label("nome_usuario"),
+            Agendamento.data,
+            Agendamento.horario_inicio,
+            Agendamento.horario_fim
+        ).join(
+            Quadra, Agendamento.id_quadra == Quadra.id
+        ).join(
+            User, Agendamento.id_usuario == User.id
+        ).filter(
+        Agendamento.id_usuario == id_usuario
+        ).all()
         
         return [AgendamentoDetalhadoResponse(
             nome_quadra=row[0],
@@ -105,3 +117,5 @@ class AgendamentoRepository:
             horario_inicio=row[3],
             horario_fim=row[4]
         ) for row in query]
+    
+        

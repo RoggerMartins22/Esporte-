@@ -57,8 +57,16 @@ class AgendamentoService:
             )
 
     @staticmethod
-    def criar_agendamento(db: Session, agendamento): 
+    def criar_agendamento(db: Session, agendamento, user_id: int): 
+         
+        user = UserRepository.get_role_user(db=db, id_usuario=user_id)
         
+        if agendamento.id_usuario != user_id and user.permissao != "ADM":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Não é possível agendar para outro usuário!"
+        )
+
         AgendamentoService.validate_agendamento_info(db, agendamento)
 
         try:
