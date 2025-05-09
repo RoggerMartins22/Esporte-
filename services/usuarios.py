@@ -5,6 +5,7 @@ from repository.usuarios import UserRepository
 from auth.hashing import AuthHandler
 from auth.auth import OAuth2
 from schemas.usuarios import UserCreate, LoginRequest, ResetPasswordRequest
+from mails.sendMail import send_email
 import re
 
 
@@ -59,6 +60,8 @@ def create_user_service(db: Session, user: UserCreate):
     try:
         result = UserRepository.create_user_repository(db=db, user=user)
         if result:
+            send_email(user)
+            
             return {
                 "status_code": status.HTTP_201_CREATED,
                 "detail": "Usuário cadastrado com sucesso!"
