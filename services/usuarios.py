@@ -4,8 +4,10 @@ from sqlalchemy.exc import IntegrityError
 from repository.usuarios import UserRepository
 from auth.hashing import AuthHandler
 from auth.auth import OAuth2
+from auth.token_handler import generate_expiration, generate_token
 from schemas.usuarios import UserCreate, LoginRequest, ResetPasswordRequest
-from mails.sendMail import send_email
+from mails.sendMail import send_email, send_email_reset_password
+from datetime import datetime
 import re
 
 
@@ -94,33 +96,54 @@ def login_user_service(db: Session, user: LoginRequest):
 
 def reset_password_service(db: Session, user: ResetPasswordRequest):
 
-    user_db = UserRepository.get_user_by_cpf(db=db, cpf=user.cpf)
+    user_db = UserRepository.get_user_by_email_cpf(db=db, user=user)
                                                
     if not user_db:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuário não encontrado!"
-        )
-
-    if not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$", user.nova_senha):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=(
-                "Senha inválida. A senha deve ter no mínimo 8 caracteres, "
-                "incluir pelo menos 1 letra maiúscula, 1 letra minúscula e 1 número."
-            )
+            detail="Usuário não encontrado ou conta inativa."
         )
     
-    user.nova_senha = AuthHandler.hash_password(user.nova_senha)
+    token = generate_token()
+    expiration = generate_expiration()
+
+    UserRepository.save_token(db, token=token, email=user.email, expiration=expiration)
+
+    send_email_reset_password(user_mail=user.email, token=token)
+    
+    return {"detail": "E-mail de redefinição enviado."}
+
+def confirm_password_reset(db, user):
+    token_record = UserRepository.get_token_record(db, user.token)
+    if not token_record or token_record.expiration < datetime.utcnow():
+        raise HTTPException(status_code=400, detail="Token inválido ou expirado.")
+
+    if not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$", user.nova_senha):
+        raise HTTPException(status_code=400, detail="Senha insegura.")
+
+    user_db = UserRepository.get_user_by_email(db, email=token_record.email)
+
+    if not user_db:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
+
+    user_db.senha = AuthHandler.hash_password(user.nova_senha)
 
     try:
-        UserRepository.update_user_password(db=db, user=user)
+        UserRepository.update_user_password(db=db, user_db=user_db)
+        UserRepository.invalidate_token(db, token_record)
         return {
             "status_code": status.HTTP_200_OK,
             "detail": "Senha redefinida com sucesso!"
+            
         }
+        
     except IntegrityError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
+    
+
+
+
+    

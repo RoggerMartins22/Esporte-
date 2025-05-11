@@ -23,6 +23,10 @@ class LoginRequest(BaseModel):
     
 class ResetPasswordRequest(BaseModel):
     cpf: str
+    email: str
+
+class ValidatrPasswordRequest(BaseModel):
+    token: str
     nova_senha: str
 
 class UserOut(UserBase):

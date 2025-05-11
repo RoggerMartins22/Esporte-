@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from models.usuarios import User
-from schemas.usuarios import UserCreate, ResetPasswordRequest
+from models.password_reset_tokens import PasswordResetToken
+from schemas.usuarios import UserCreate, ResetPasswordRequest, StatusEnum
 
 class UserRepository:
     @staticmethod
@@ -25,16 +26,16 @@ class UserRepository:
     def get_user_by_cpf(db: Session, cpf: str):
         return db.query(User).filter(User.cpf == cpf).first()
     
+    def get_user_by_email_cpf(db, user: User):
+        return db.query(User).filter(User.email == user.email, User.cpf == user.cpf).first()
+    
     @staticmethod
-    def update_user_password(db: Session, user: ResetPasswordRequest):
-
-        db_user = UserRepository.get_user_by_cpf(db, cpf=user.cpf)
+    def update_user_password(db: Session, user_db):
 
         try:
-            db_user.senha = user.nova_senha
             db.commit()
-            db.refresh(db_user)
-            return db_user
+            db.refresh(user_db)
+            return user_db
         except IntegrityError as e:
             db.rollback()
             raise e
@@ -46,3 +47,17 @@ class UserRepository:
     @staticmethod
     def get_role_user(db: Session, id_usuario: int):
         return db.query(User).filter(User.id == id_usuario).first()
+
+
+
+    def save_token(db, token, email, expiration):
+        db_token = PasswordResetToken(token=token, email=email, expiration=expiration)
+        db.add(db_token)
+        db.commit()
+
+    def get_token_record(db, token):
+        return db.query(PasswordResetToken).filter_by(token=token).first()
+
+    def invalidate_token(db, token_record):
+        db.delete(token_record)
+        db.commit()
