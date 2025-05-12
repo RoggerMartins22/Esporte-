@@ -42,11 +42,19 @@ class AgendamentoRepository:
     def get_agendamento_by_data_hora(db: Session, agendamento):
         return db.query(Agendamento).filter(
             Agendamento.data == agendamento.data,
-            Agendamento.horario_inicio <= agendamento.horario_inicio,
-            Agendamento.horario_fim >= agendamento.horario_fim,
+            Agendamento.horario_inicio < agendamento.horario_fim,
+            Agendamento.horario_fim > agendamento.horario_inicio,
             Agendamento.id_quadra == agendamento.id_quadra,
             Agendamento.status == AgendamentoStatus.confirmado
         ).first()
+    
+    @staticmethod
+    def get_agendamentos_by_quandrant_date(db: Session, data, id_quadra):
+        return db.query(Agendamento).filter(
+            Agendamento.id_quadra == id_quadra,
+            Agendamento.data == data,
+            Agendamento.status == AgendamentoStatus.confirmado
+        ).all()
     
     @staticmethod
     def get_agendamentos(db: Session, id_quadra: Optional[int] = None, id_usuario: Optional[int] = None) -> List[AgendamentoDetalhadoResponse]:

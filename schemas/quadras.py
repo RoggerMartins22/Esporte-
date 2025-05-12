@@ -18,6 +18,12 @@ class QuadraBase(BaseModel):
 class QuadraCreate(QuadraBase):
     pass  
 
+class QuadraUpdate(QuadraBase):
+    disponibilidade: DisponivelEnum
+
+    class Config:
+        orm_mode = True
+
 class Quadra(QuadraBase):
     ID: int
 
