@@ -109,7 +109,7 @@ def enviar_email_redefinicao_senha(db: Session, user: ResetPasswordRequest):
 
     UserRepository.save_token(db, token=token, email=user.email, expiration=expiration)
 
-    send_email_reset_password(user_mail=user.email, token=token)
+    send_email_reset_password(email=user.email, nome=user_db.nome, token=token)
     
     return {"detail": "Se os dados informados estiverem corretos, um e-mail será enviado."}
 
