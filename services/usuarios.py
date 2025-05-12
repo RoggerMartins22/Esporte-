@@ -94,7 +94,7 @@ def login_user_service(db: Session, user: LoginRequest):
     return OAuth2.user_login(user_db)
                 
 
-def reset_password_service(db: Session, user: ResetPasswordRequest):
+def enviar_email_redefinicao_senha(db: Session, user: ResetPasswordRequest):
 
     user_db = UserRepository.get_user_by_email_cpf(db=db, user=user)
                                                
@@ -111,10 +111,12 @@ def reset_password_service(db: Session, user: ResetPasswordRequest):
 
     send_email_reset_password(user_mail=user.email, token=token)
     
-    return {"detail": "E-mail de redefinição enviado."}
+    return {"detail": "Se os dados informados estiverem corretos, um e-mail será enviado."}
 
-def confirm_password_reset(db, user):
+def redefinir_senha_com_token(db, user):
+    
     token_record = UserRepository.get_token_record(db, user.token)
+
     if not token_record or token_record.expiration < datetime.utcnow():
         raise HTTPException(status_code=400, detail="Token inválido ou expirado.")
 
@@ -131,11 +133,8 @@ def confirm_password_reset(db, user):
     try:
         UserRepository.update_user_password(db=db, user_db=user_db)
         UserRepository.invalidate_token(db, token_record)
-        return {
-            "status_code": status.HTTP_200_OK,
-            "detail": "Senha redefinida com sucesso!"
-            
-        }
+        
+        return {"detail": "Senha redefinida com sucesso!"}
         
     except IntegrityError as e:
         raise HTTPException(
