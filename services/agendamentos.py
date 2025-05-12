@@ -5,7 +5,7 @@ from schemas.agendamentos import AgendamentoStatus
 from repository.quadras import QuadrantRepository
 from repository.usuarios import UserRepository
 from repository.agendamentos import AgendamentoRepository
-from mails.sendMail import send_email_agendamento
+from mails.sendMail import send_email_agendamento, send_email_cancelamento_agendamento
 from datetime import datetime
 now = datetime.now()
 
@@ -204,6 +204,8 @@ class AgendamentoService:
                 )
 
             if AgendamentoRepository.cancelar_agendamento(db=db, id_agendamento=id_agendamento):
+
+                send_email_cancelamento_agendamento(user.email, user.nome, agendamento= AgendamentoRepository.get_agendamento_detalhado_by_id(db=db, id_agendamento=id_agendamento))
 
                 return {
                     "status_code": status.HTTP_200_OK,

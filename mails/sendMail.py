@@ -84,3 +84,30 @@ def send_email_agendamento(email, nome, agendamento):
     finally:
         if server:
             server.quit()
+
+def send_email_cancelamento_agendamento(email, nome, agendamento): 
+    server = None
+    server_smtp = Config.CONECTION
+    port = Config.PORT
+    sender_email = Config.MAIL
+    password = Config.MAIL_PASSWORD
+    receive_email = email
+    body = InfoMail.EmailCancelamentoAgendamento(nome, agendamento)
+    subject = 'Cancelamento de Agendamento!'
+
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = receive_email
+    message["Subject"] = subject
+    message.attach(MIMEText(body, "html"))
+
+    try:
+        server = smtplib.SMTP(server_smtp, port)
+        server.starttls()
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receive_email, message.as_string())
+    except Exception:
+        print("Erro: Endereço de E-mail Inválido")
+    finally:
+        if server:
+            server.quit()
