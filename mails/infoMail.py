@@ -32,3 +32,25 @@ def EmailCadastro(nome):
         </html>
     """
     return body
+
+def EmailRedefinicaoSenha(nome, token):
+    body = f"""
+        <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8">
+                <title>Redefinição de Senha</title>
+            </head>
+            <body style="font-family: Arial, sans-serif; color: #333;">
+                <h2>Redefinição de Senha</h2>
+                <p>Olá <strong>{nome}</strong>,</p>
+                <p>Recebemos um pedido para redefinir sua senha.</p>
+                <p>Clique no link abaixo para redefinir sua senha:</p>
+                <a href="http://localhost:8000/usuario/validar-nova-senha/{token}">Redefinir Senha</a>
+                <br><br>
+                <p>Se você não solicitou essa alteração, ignore este e-mail.</p>
+                <br>
+                <p>Atenciosamente,<br>Equipe Esporte+</p>
+            </body>
+        </html>
+    """
+    return body

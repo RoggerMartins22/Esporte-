@@ -1,7 +1,7 @@
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from mails.infoMail import EmailCadastro, Config
+from mails.infoMail import EmailCadastro, EmailRedefinicaoSenha, Config
 
 def send_email(user_info):
     server = None
@@ -31,25 +31,17 @@ def send_email(user_info):
         if server:
             server.quit()
 
-def send_email_reset_password(user_mail: str, token: str):
+def send_email_reset_password(email, nome, token: str):
     server = None
     server_smtp = Config.CONECTION
     port = Config.PORT
     sender_email = Config.MAIL
     password = Config.MAIL_PASSWORD
-    receive_email = user_mail
+    receive_email = email
+    body = EmailRedefinicaoSenha(nome, token)
     subject = 'Redefinição de Senha Esporte+!'
 
-    body = f"""
-        <html>
-            <body>
-                <h1>Redefinição de Senha</h1>
-                <p>Olá,</p>
-                <p>Você solicitou a redefinição da sua senha. Clique no link abaixo para redefinir sua senha:</p>
-                <a href="http://localhost:8000/usuario/validar-nova-senha/{token}">Redefinir Senha</a>
-            </body>
-        </html>
-    """
+    
 
     message = MIMEMultipart()
     message["From"] = sender_email
