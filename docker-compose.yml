@@ -9,6 +9,8 @@ services:
       - db
     networks:
       - app-network
+    restart: on-failure
+
 
   db:
     image: postgres:13
