@@ -5,6 +5,7 @@ from schemas.agendamentos import AgendamentoStatus
 from repository.quadras import QuadrantRepository
 from repository.usuarios import UserRepository
 from repository.agendamentos import AgendamentoRepository
+from mails.sendMail import send_email_agendamento
 from datetime import datetime
 now = datetime.now()
 
@@ -72,6 +73,7 @@ class AgendamentoService:
         try:
             result = AgendamentoRepository.create_agendamento_repository(db=db, agendamento=agendamento)
             if result:
+                send_email_agendamento(user.email, user.nome, agendamento= AgendamentoRepository.get_agendamento_detalhado_by_id(db=db, id_agendamento=result.id_agendamento))
                 return {
                     "status_code": status.HTTP_201_CREATED,
                     "detail": "Agendamento criado com sucesso!",

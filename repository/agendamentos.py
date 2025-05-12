@@ -126,4 +126,28 @@ class AgendamentoRepository:
             horario_fim=row[4]
         ) for row in query]
     
+    def get_agendamento_detalhado_by_id(db: Session, id_agendamento: int) -> Optional[AgendamentoDetalhadoResponse]:
+        result = db.query(
+            Quadra.nome_quadra.label("nome_quadra"),
+            User.nome.label("nome_usuario"),
+            Agendamento.data,
+            Agendamento.horario_inicio,
+            Agendamento.horario_fim
+        ).join(
+            Quadra, Agendamento.id_quadra == Quadra.id
+        ).join(
+            User, Agendamento.id_usuario == User.id
+        ).filter(
+            Agendamento.id_agendamento == id_agendamento
+        ).first()
+
+        if result:
+            return AgendamentoDetalhadoResponse(
+                nome_quadra=result[0],
+                nome_usuario=result[1],
+                data=result[2],
+                horario_inicio=result[3],
+                horario_fim=result[4]
+            )
+        return None
         
