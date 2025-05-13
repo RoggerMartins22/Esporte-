@@ -1,12 +1,12 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
-from schemas.agendamentos import AgendamentoStatus
+from schemas.agendamentos import AgendamentoCreate, AgendamentoStatus
 from repository.quadras import QuadrantRepository
 from repository.usuarios import UserRepository
 from repository.agendamentos import AgendamentoRepository
 from mails.sendMail import send_email_agendamento, send_email_cancelamento_agendamento
-from datetime import datetime
+from datetime import datetime, date
 now = datetime.now()
 
 
@@ -89,7 +89,35 @@ class AgendamentoService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Erro ao criar agendamento: " + str(e)
             )
-        
+    
+    @staticmethod
+    def renovar_agendamento(db: Session, id_agendamento: int, nova_data: date, user_id: int):
+
+        user = UserRepository.get_role_user(db=db, id_usuario=user_id)
+        agendamento_antigo = AgendamentoRepository.get_agendamento_by_id(db, id_agendamento)
+
+        if not agendamento_antigo:
+            raise HTTPException(status_code=404, detail="Não foi encontrado agendamento para renovar.")
+
+        if agendamento_antigo.status != AgendamentoStatus.concluido:
+            raise HTTPException(status_code=400, detail="Apenas agendamentos concluidos podem ser renovados.")
+
+        if agendamento_antigo.id_usuario != user_id and user.permissao == "USER":
+            raise HTTPException(status_code=403, detail="Você não tem permissão!")
+
+        novo_agendamento = AgendamentoCreate(
+            id_quadra=agendamento_antigo.id_quadra,
+            id_usuario=user_id,
+            data=nova_data,
+            horario_inicio=agendamento_antigo.horario_inicio,
+            horario_fim=agendamento_antigo.horario_fim
+        )
+
+        AgendamentoService.validate_agendamento_info(db, agendamento=novo_agendamento)
+
+        return AgendamentoRepository.create_agendamento_repository(db=db, agendamento=novo_agendamento)
+
+
     @staticmethod
     def listar_agendamentos(db: Session, user_id: int):
         try:
