@@ -58,9 +58,6 @@ Esporte-/
 
 ### 👤 **Usuários**
 - `POST /usuarios/cadastrar` – Cadastrar novo usuário.
-- `PUT /usuarios/{id}` – Atualizar dados de um usuário (**EM PROCESSO DE IMPLEMENTAÇÃO**)
-
-### 🔐 **Autenticação**
 - `POST /usuarios/login/` – Autenticar e receber um token JWT.
 - `POST /usuarios/redefinir-senha/` – Redefine a senha do usuário.
 
