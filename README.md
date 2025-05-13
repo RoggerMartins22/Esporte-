@@ -57,25 +57,25 @@ Esporte-/
 ## 📡 Principais Rotas da API
 
 ### 👤 **Usuários**
-- `POST /usuarios/cadastrar` – Cadastrar novo usuário
+- `POST /usuarios/cadastrar` – Cadastrar novo usuário.
 - `PUT /usuarios/{id}` – Atualizar dados de um usuário (**EM PROCESSO DE IMPLEMENTAÇÃO**)
 
 ### 🔐 **Autenticação**
-- `POST /usuarios/login/` – Autenticar e receber um token JWT
-- `POST /usuarios/redefinir-senha/` – Redefine a senha do usuário
+- `POST /usuarios/login/` – Autenticar e receber um token JWT.
+- `POST /usuarios/redefinir-senha/` – Redefine a senha do usuário.
 
 ### 🏟️ **Quadras**
-- `POST /quadras/cadastrar` – Cadastrar nova quadra (**ADM**)
-- `GET /quadras/` – Listar quadras disponíveis (**EM PROCESSO DE IMPLEMENTAÇÃO**)
-- `PUT /quadras/{id}` – Atualizar informações da quadra (**EM PROCESSO DE IMPLEMENTAÇÃO**)
+- `POST /quadras/cadastrar` – Cadastrar nova quadra. (**ADM**)
+- `GET /quadras/listar-quadras` – Listar quadras disponíveis
+- `GET /quadras/listar-quadras/{id_quadra}` – Consulta Quadra
+- `GET /quadras/horarios-disponiveis` – Listar horários disponíveis.
+- `PUT /quadras/{id}` – Atualizar informações da quadra. (**ADM**)
 
 ### 📅 **Agendamentos**
 - `POST /agendamentos/agendar-quadra` – Criar novo agendamento
-- `GET /agendamentos/` – Listar agendamentos (usuário ou **ADM**)
-- `GET /agendamentos/quadra/{id_quadra}` – Listar agendamentos por Quadra (usuário ou **ADM**)
+- `GET /agendamentos/` – Listar agendamentos.
+- `GET /agendamentos/quadra/{id_quadra}` – Listar agendamentos por Quadra.
 - `GET /agendamentos/usuario/{id_usuario}` – Listar agendamentos por Usuário (**ADM**)
-- `PUT /agendamentos/{id}` – Atualizar agendamento (**EM PROCESSO DE IMPLEMENTAÇÃO**)
-- `PUT /agendamentos/concluir/{id}` – Concluir um agendamento (**EM PROCESSO DE IMPLEMENTAÇÃO**)
 - `PUT /agendamentos/cancelar/{id_agendamento}` – Cancela um agendamento (usuário ou **ADM**)
 
 ⚠️ Algumas rotas são restritas a usuários com permissão de administrador (**ADM**).
