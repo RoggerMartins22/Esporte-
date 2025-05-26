@@ -103,3 +103,28 @@ class InfoMail:
             </html>
         """
         return body
+    
+    def EmailRenovacaoAgendamento(nome, agendamento):
+        body = f"""
+            <html lang="pt-BR">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Agendamento Renovado</title>
+                </head>
+                <body style="font-family: Arial, sans-serif; color: #333;">
+                    <h2>Agendamento renovado!</h2>
+                    <p>Olá <strong>{nome}</strong>,</p>
+                    <p>Seu agendamento foi renovado com sucesso.</p>
+                    <p>Detalhes do agendamento:</p>
+                    <ul>
+                        <li><strong>Quadra:</strong> {agendamento.nome_quadra}</li>
+                        <li><strong>Data:</strong> {agendamento.data}</li>
+                        <li><strong>Horário de Início:</strong> {agendamento.horario_inicio}</li>
+                        <li><strong>Horário de Fim:</strong> {agendamento.horario_fim}</li>
+                    </ul>
+                    <br>
+                    <p>Atenciosamente,<br>Equipe Esporte+</p>
+                </body>
+            </html>
+        """
+        return body
