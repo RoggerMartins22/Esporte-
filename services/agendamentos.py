@@ -1,12 +1,12 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
-from schemas.agendamentos import AgendamentoCreate, AgendamentoStatus
+from schemas.agendamentos import AgendamentoCreate, AgendamentoStatus, AgendamentoRenovarRequest
 from repository.quadras import QuadrantRepository
 from repository.usuarios import UserRepository
 from repository.agendamentos import AgendamentoRepository
-from mails.sendMail import send_email_agendamento, send_email_cancelamento_agendamento
-from datetime import datetime, date
+from mails.sendMail import send_email_agendamento, send_email_cancelamento_agendamento, send_email_renovacao_agendamento
+from datetime import datetime
 now = datetime.now()
 
 
@@ -62,13 +62,13 @@ class AgendamentoService:
          
         user = UserRepository.get_role_user(db=db, id_usuario=user_id)
         
-        if agendamento.id_usuario != user_id and user.permissao != "ADM":
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Não é possível agendar para outro usuário!"
-        )
+        id_usuario_agendamento = agendamento.id_usuario or user_id 
+        agendamento.id_usuario=id_usuario_agendamento
 
-        AgendamentoService.validate_agendamento_info(db, agendamento)
+        if id_usuario_agendamento != user_id and user.permissao != "ADM":
+            raise HTTPException(status_code=403, detail="Não autorizado a agendar para outro usuário")
+
+        AgendamentoService.validate_agendamento_info(db, agendamento=agendamento)
 
         try:
             result = AgendamentoRepository.create_agendamento_repository(db=db, agendamento=agendamento)
@@ -91,7 +91,7 @@ class AgendamentoService:
             )
     
     @staticmethod
-    def renovar_agendamento(db: Session, id_agendamento: int, nova_data: date, user_id: int):
+    def renovar_agendamento(db: Session, id_agendamento: int, nova_data: AgendamentoRenovarRequest, user_id: int):
 
         user = UserRepository.get_role_user(db=db, id_usuario=user_id)
         agendamento_antigo = AgendamentoRepository.get_agendamento_by_id(db, id_agendamento)
@@ -108,15 +108,33 @@ class AgendamentoService:
         novo_agendamento = AgendamentoCreate(
             id_quadra=agendamento_antigo.id_quadra,
             id_usuario=user_id,
-            data=nova_data,
+            data=nova_data.nova_data,
             horario_inicio=agendamento_antigo.horario_inicio,
             horario_fim=agendamento_antigo.horario_fim
         )
 
         AgendamentoService.validate_agendamento_info(db, agendamento=novo_agendamento)
 
-        return AgendamentoRepository.create_agendamento_repository(db=db, agendamento=novo_agendamento)
-
+        try:
+            result = AgendamentoRepository.create_agendamento_repository(db=db, agendamento=novo_agendamento)
+            if result:
+                AgendamentoRepository.renovar_agendamento(db=db, id_agendamento=id_agendamento)
+                send_email_renovacao_agendamento(user.email, user.nome, agendamento= AgendamentoRepository.get_agendamento_detalhado_by_id(db=db, id_agendamento=result.id_agendamento))
+                return {
+                    "status_code": status.HTTP_201_CREATED,
+                    "detail": "Agendamento renovado com sucesso!",
+                    "Agendamento": result
+                }
+        except IntegrityError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e) 
+            )
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Erro ao renovar agendamento: " + str(e)
+            )
 
     @staticmethod
     def listar_agendamentos(db: Session, user_id: int):
@@ -143,6 +161,33 @@ class AgendamentoService:
                 detail="Erro ao listar agendamentos: " + str(e)
             )
         
+    @staticmethod
+    def listar_agendamento(db: Session, id_agendamento: int, user_id: int):
+        try:
+            user = UserRepository.get_role_user(db=db, id_usuario=user_id)
+            agendamento = AgendamentoRepository.get_agendamento_detalhado_by_id(db=db, id_agendamento=id_agendamento)
+            
+            if not agendamento:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Agendamento não encontrado."
+                )
+
+            if agendamento.id_usuario != user_id and user.permissao != "ADM":
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Você não tem permissão para cancelar este agendamento!"
+                )
+            return agendamento
+        
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Erro ao lista agendamento: " + str(e)
+            )
+
     @staticmethod
     def listar_agendamentos_por_id_quadra(db: Session, id_quadra: int, user_id: int):
         try:

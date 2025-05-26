@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import date
 from auth.auth import token_verifier, get_current_user_id
 from database.database import get_db
-from schemas.agendamentos import AgendamentoCreate
+from schemas.agendamentos import AgendamentoCreate, AgendamentoRenovarRequest
 from services.agendamentos import AgendamentoService
 
 router = APIRouter(
@@ -20,6 +20,10 @@ async def criar_agendamento(agendamento: AgendamentoCreate, db: Session = Depend
 def listar_agendamentos(db: Session = Depends(get_db), user_id = Depends(get_current_user_id)):
     return AgendamentoService.listar_agendamentos(db=db, user_id=user_id)
 
+@router.get("/{id_agendamento}")
+def listar_agendamento(id_agendamento: int, db: Session = Depends(get_db), user_id = Depends(get_current_user_id)):
+    return AgendamentoService.listar_agendamento(db=db, id_agendamento=id_agendamento, user_id=user_id)
+
 @router.get("/quadra/{id_quadra}")
 def listar_agendamentos_por_id_quadra(id_quadra: int, db: Session = Depends(get_db), user_id = Depends(get_current_user_id)):
     return AgendamentoService.listar_agendamentos_por_id_quadra(db=db, id_quadra=id_quadra, user_id=user_id)
@@ -33,5 +37,5 @@ def cancelar_agendamento(id_agendamento: int, db: Session = Depends(get_db), use
     return AgendamentoService.cancelar_agendamento(db=db, id_agendamento=id_agendamento, user_id=user_id)
 
 @router.post("/renovar/{id_agendamento}")
-def renovar_agendamento(id_agendamento: int, nova_data: date, db: Session = Depends(get_db), user_id = Depends(get_current_user_id)):
-    return AgendamentoService.renovar_agendamento(db, id_agendamento, nova_data, user_id)
+def renovar_agendamento(id_agendamento: int, nova_data: AgendamentoRenovarRequest, db: Session = Depends(get_db), user_id = Depends(get_current_user_id)):
+    return AgendamentoService.renovar_agendamento(db, id_agendamento, nova_data=nova_data, user_id=user_id)
