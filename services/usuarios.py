@@ -82,10 +82,16 @@ def login_user_service(db: Session, user: LoginRequest):
     if not user_db:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="CPF ou senha incorreta!"
+            detail="Usuário não encontrado"
         )
     
-    if not AuthHandler.verify_password(user.senha, user_db.senha):
+    elif user_db.status == "C":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Conta inativa. Entre em contato com o suporte."
+        )
+    
+    elif not AuthHandler.verify_password(user.senha, user_db.senha):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="CPF ou senha incorreta!"
