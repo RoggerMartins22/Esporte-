@@ -9,7 +9,7 @@ class DisponivelEnum(str, Enum):
 class QuadraBase(BaseModel):
     nome_quadra: str
     endereco: str
-    esporte: str
+    esporte: int
     descricao: Optional[str] = None
 
     class Config:
