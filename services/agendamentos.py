@@ -137,6 +137,25 @@ class AgendamentoService:
             )
 
     @staticmethod
+    def get_proximo_agendamento(db: Session, user_id: int):
+        try:
+            agendamento = AgendamentoRepository.get_proximo_agendamento(db=db, id_usuario=user_id)
+
+            if not agendamento:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Nenhum agendamento encontrado."
+                )
+            return agendamento
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Erro ao listar agendamento: " + str(e)
+            )
+
+    @staticmethod
     def listar_agendamentos(db: Session, user_id: int):
         try:
             user = UserRepository.get_role_user(db=db, id_usuario=user_id)

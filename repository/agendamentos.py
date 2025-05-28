@@ -1,10 +1,12 @@
-from sqlalchemy.orm import Session
-from typing import Optional, List
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import and_, or_
+from typing import Optional, List
 from models.agendamentos import Agendamento
 from models.quadras import Quadra
 from models.usuarios import User
 from schemas.agendamentos import AgendamentoCreate, AgendamentoDetalhadoResponse, AgendamentoStatus
+from datetime import datetime
 
 class AgendamentoRepository:
 
@@ -101,6 +103,42 @@ class AgendamentoRepository:
             status=row[6]
         ) for row in result]
     
+    @staticmethod
+    def get_proximo_agendamento(db: Session, id_usuario: int):
+        now = datetime.now()
+        hoje = now.date()
+        hora_atual = now.time()
+
+        agendamento = db.query(Agendamento).options(
+            joinedload(Agendamento.quadras),
+            joinedload(Agendamento.users)
+        ).filter(
+            Agendamento.id_usuario == id_usuario,
+            Agendamento.status == AgendamentoStatus.confirmado,
+            or_(
+                Agendamento.data > hoje,
+                and_(
+                    Agendamento.data == hoje,
+                    Agendamento.horario_inicio > hora_atual
+                )
+            )
+        ).order_by(
+            Agendamento.data.asc(),
+            Agendamento.horario_inicio.asc()
+        ).first()
+
+        if agendamento:
+            return AgendamentoDetalhadoResponse(
+                id_agendamento=agendamento.id_agendamento,
+                nome_quadra=agendamento.quadras.nome_quadra,
+                nome_usuario=agendamento.users.nome,
+                data=agendamento.data,
+                horario_inicio=agendamento.horario_inicio,
+                horario_fim=agendamento.horario_fim,
+                status=agendamento.status
+            )
+        return None
+        
     @staticmethod
     def get_agendamento_by_id(db: Session, id_agendamento: int):
         return db.query(Agendamento).filter(Agendamento.id_agendamento == id_agendamento).first()

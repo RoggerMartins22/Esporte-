@@ -20,6 +20,10 @@ async def criar_agendamento(agendamento: AgendamentoCreate, db: Session = Depend
 def listar_agendamentos(db: Session = Depends(get_db), user_id = Depends(get_current_user_id)):
     return AgendamentoService.listar_agendamentos(db=db, user_id=user_id)
 
+@router.get("/proximo")
+def get_proximo_agendamento(db: Session = Depends(get_db), user_id: int = Depends(get_current_user_id)):
+    return AgendamentoService.get_proximo_agendamento(db, user_id)
+
 @router.get("/{id_agendamento}")
 def listar_agendamento(id_agendamento: int, db: Session = Depends(get_db), user_id = Depends(get_current_user_id)):
     return AgendamentoService.listar_agendamento(db=db, id_agendamento=id_agendamento, user_id=user_id)
