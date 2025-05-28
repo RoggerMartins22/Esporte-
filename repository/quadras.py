@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 from models.quadras import Quadra
 from schemas.quadras import QuadraCreate, QuadraUpdate, DisponivelEnum
@@ -49,8 +49,41 @@ class QuadrantRepository:
     
     @staticmethod
     def get_quadrants(db: Session):
-        return db.query(Quadra).all()
+        quadras_com_esportes_obj = (
+            db.query(Quadra)
+            .options(joinedload(Quadra.esporte_info))
+            .all()
+        )
+
+        resultados_formatados = []
+        for quadra_obj in quadras_com_esportes_obj:
+            resultados_formatados.append({
+                "id": quadra_obj.id,
+                "nome_quadra": quadra_obj.nome_quadra,
+                "endereco": quadra_obj.endereco,
+                "esporte": quadra_obj.esporte_info.descricao if quadra_obj.esporte_info else None,
+                "descricao": quadra_obj.descricao,
+                "disponibilidade" : quadra_obj.disponibilidade,
+            })
+        return resultados_formatados
     
     @staticmethod
     def get_quadrants_available(db: Session):
-        return db.query(Quadra).filter(Quadra.disponibilidade == DisponivelEnum.S).all()
+        quadras_disponiveis_obj = (
+            db.query(Quadra)
+            .filter(Quadra.disponibilidade == DisponivelEnum.S)
+            .options(joinedload(Quadra.esporte_info))
+            .all()
+        )
+
+        resultados_formatados = []
+        for quadra_obj in quadras_disponiveis_obj:
+            resultados_formatados.append({
+                "id": quadra_obj.id,
+                "nome_quadra": quadra_obj.nome_quadra,
+                "endereco": quadra_obj.endereco,
+                "esporte": quadra_obj.esporte_info.descricao if quadra_obj.esporte_info else None,
+                "descricao": quadra_obj.descricao,
+                "disponibilidade" : quadra_obj.disponibilidade,
+            })
+        return resultados_formatados
