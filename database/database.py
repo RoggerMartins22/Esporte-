@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from models.quadras import Quadra
 from models.usuarios import User
 from models.agendamentos import Agendamento
-from models.esporte import Esportes
+from models.esporte import Esporte
 from dotenv import load_dotenv
 import os
 load_dotenv()
