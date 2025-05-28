@@ -148,6 +148,17 @@ def redefinir_senha_com_token(db, user):
             detail=str(e)
         )
     
+def consulta_info_usuarios(db: Session, user_id: int):
+
+    user = UserRepository.get_info_user(db=db, id_usuario=user_id)
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuário não encontrado."
+        )
+    
+    return user
 
 
 
