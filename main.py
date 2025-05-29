@@ -1,11 +1,16 @@
 from fastapi import FastAPI
 from routers import usuarios, quadras, agendamentos
 from fastapi.middleware.cors import CORSMiddleware
+import os
+from dotenv import load_dotenv
+
+load_dotenv() 
+FRONTEND_URL = os.getenv("FRONTEND_URL") 
 
 app = FastAPI()
 
 origins = [
-    "http://localhost:5173", 
+    FRONTEND_URL
 ]
 
 app.add_middleware(
