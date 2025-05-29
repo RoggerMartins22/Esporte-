@@ -4,7 +4,7 @@ load_dotenv()
 
 class Config:
     CONECTION = os.getenv("CONECTION")
-    PORT = os.getenv("PORT")
+    SMTP_PORT = os.getenv("SMTP_PORT")
     MAIL = os.getenv("MAIL")
     MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
 
