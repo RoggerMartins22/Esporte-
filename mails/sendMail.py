@@ -34,7 +34,7 @@ def send_email(user_info):
 def send_email_reset_password(email, nome, token: str):
     server = None
     server_smtp = Config.CONECTION
-    port = Config.PORT
+    port = Config.SMTP_PORT
     sender_email = Config.MAIL
     password = Config.MAIL_PASSWORD
     receive_email = email
@@ -61,7 +61,7 @@ def send_email_reset_password(email, nome, token: str):
 def send_email_agendamento(email, nome, agendamento):
     server = None
     server_smtp = Config.CONECTION
-    port = Config.PORT
+    port = Config.SMTP_PORT
     sender_email = Config.MAIL
     password = Config.MAIL_PASSWORD
     receive_email = email
@@ -88,7 +88,7 @@ def send_email_agendamento(email, nome, agendamento):
 def send_email_cancelamento_agendamento(email, nome, agendamento): 
     server = None
     server_smtp = Config.CONECTION
-    port = Config.PORT
+    port = Config.SMTP_PORT
     sender_email = Config.MAIL
     password = Config.MAIL_PASSWORD
     receive_email = email
@@ -115,7 +115,7 @@ def send_email_cancelamento_agendamento(email, nome, agendamento):
 def send_email_renovacao_agendamento(email, nome, agendamento):
     server = None
     server_smtp = Config.CONECTION
-    port = Config.PORT
+    port = Config.SMTP_PORT
     sender_email = Config.MAIL
     password = Config.MAIL_PASSWORD
     receive_email = email
