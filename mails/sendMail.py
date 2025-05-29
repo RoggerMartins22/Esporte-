@@ -6,7 +6,7 @@ from mails.infoMail import InfoMail, Config
 def send_email(user_info):
     server = None
     server_smtp = Config.CONECTION
-    port = Config.PORT
+    port = Config.SMTP_PORT
     sender_email = Config.MAIL
     password = Config.MAIL_PASSWORD
     receive_email = user_info.email
