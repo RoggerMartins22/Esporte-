@@ -8,4 +8,4 @@ class PasswordResetToken(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, index=True)
     token = Column(String, unique=True, index=True)
-    expiration = Column(DateTime, default=datetime.utcnow() + timedelta(hours=1)) 
+    expiration = Column(DateTime(timezone=True), nullable=False)

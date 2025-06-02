@@ -5,9 +5,9 @@ from repository.usuarios import UserRepository
 from auth.hashing import AuthHandler
 from auth.auth import OAuth2
 from auth.token_handler import generate_expiration, generate_token
-from schemas.usuarios import UserCreate, LoginRequest, ResetPasswordRequest
+from schemas.usuarios import UserCreate, LoginRequest, ResetPasswordRequest, ValidatePasswordRequest
 from mails.sendMail import send_email, send_email_reset_password
-from datetime import datetime
+from datetime import datetime, timezone
 import re
 
 
@@ -119,14 +119,14 @@ def enviar_email_redefinicao_senha(db: Session, user: ResetPasswordRequest):
     
     return {"detail": "Se os dados informados estiverem corretos, um e-mail será enviado."}
 
-def redefinir_senha_com_token(db, user):
+def redefinir_senha_com_token(db, token, nova_senha: ValidatePasswordRequest):
     
-    token_record = UserRepository.get_token_record(db, user.token)
+    token_record = UserRepository.get_token_record(db, token)
 
-    if not token_record or token_record.expiration < datetime.utcnow():
+    if not token_record or token_record.expiration < datetime.now(timezone.utc):
         raise HTTPException(status_code=400, detail="Token inválido ou expirado.")
 
-    if not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$", user.nova_senha):
+    if not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$", nova_senha.nova_senha):
         raise HTTPException(status_code=400, detail="Senha insegura.")
 
     user_db = UserRepository.get_user_by_email(db, email=token_record.email)
@@ -134,7 +134,7 @@ def redefinir_senha_com_token(db, user):
     if not user_db:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
 
-    user_db.senha = AuthHandler.hash_password(user.nova_senha)
+    user_db.senha = AuthHandler.hash_password(nova_senha.nova_senha)
 
     try:
         UserRepository.update_user_password(db=db, user_db=user_db)
