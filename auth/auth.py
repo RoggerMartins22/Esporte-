@@ -1,6 +1,6 @@
 from fastapi.security import HTTPBearer
 from fastapi import Depends
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from schemas.usuarios import UserBase
 from fastapi import HTTPException, status
 from jose import jwt, JWTError
@@ -28,7 +28,7 @@ class OAuth2:
     @staticmethod
     def user_login(user: UserBase, expires_in: int = 30):
 
-            exp = datetime.utcnow() + timedelta(minutes=expires_in)
+            exp = datetime.now(timezone.utc) + timedelta(minutes=expires_in)
             
             payload = {
                 'sub': str(user.id),
