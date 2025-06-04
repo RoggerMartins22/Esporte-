@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from services.usuarios import UserService
-from schemas.usuarios import UserCreate, LoginRequest, ResetPasswordRequest, ValidatePasswordRequest, NomeUpdate
+from schemas.usuarios import UserCreate, LoginRequest, ResetPasswordRequest, ValidatePasswordRequest, NomeUpdate, EmailUpdate
 from auth.auth import token_verifier, get_current_user_id
 from database.database import get_db
 
@@ -46,3 +46,7 @@ async def consulta_dados_usuarios(db: Session = Depends(get_db), user_id = Depen
 @routerUser.post("/alterar-nome")
 async def alterar_nome_usuario(nome: NomeUpdate, db: Session = Depends(get_db), user_id = Depends(get_current_user_id)):
     return UserService.update_nome_usuario(db=db, nome=nome, user_id=user_id)
+
+@routerUser.post("/alterar-email")
+async def alterar_email_usuario(email: EmailUpdate, db: Session = Depends(get_db), user_id = Depends(get_current_user_id)):
+    return UserService.update_email_usuario(db=db, email=email, user_id=user_id)

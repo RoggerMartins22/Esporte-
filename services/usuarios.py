@@ -5,7 +5,7 @@ from repository.usuarios import UserRepository
 from auth.hashing import AuthHandler
 from auth.auth import OAuth2
 from auth.token_handler import generate_expiration, generate_token
-from schemas.usuarios import UserCreate, LoginRequest, UserInfoResponse, ResetPasswordRequest, ValidatePasswordRequest, NomeUpdate
+from schemas.usuarios import UserCreate, LoginRequest, UserInfoResponse, ResetPasswordRequest, ValidatePasswordRequest, NomeUpdate, EmailUpdate
 from mails.sendMail import send_email, send_email_reset_password
 from datetime import datetime, timezone
 import re
@@ -167,7 +167,6 @@ class UserService:
         )
 
     def update_nome_usuario(db: Session, nome: NomeUpdate, user_id: int):
-        print(type(nome))
         if not re.match(r"^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$", nome.nome):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -185,8 +184,41 @@ class UserService:
         user.nome = nome.nome
         
         try:
-            UserRepository.update_user_name(db=db, user=user)
+            UserRepository.update_user_date(db=db, user=user)
             return {"detail": "Nome atualizado com sucesso!"}
+            
+        except IntegrityError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e)
+            )
+    @staticmethod
+    def update_email_usuario(db: Session, email: EmailUpdate, user_id: int):
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email.email):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="E-mail inválido."
+            )
+
+        user = UserRepository.get_info_user(db=db, id_usuario=user_id)
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuário não encontrado."
+            )
+        
+        if UserRepository.get_user_by_email(db=db, email=email.email):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Já existe um usuário com este e-mail cadastrado."
+            )
+        
+        user.email = email.email
+        
+        try:
+            UserRepository.update_user_date(db=db, user=user)
+            return {"detail": "E-mail atualizado com sucesso!"}
             
         except IntegrityError as e:
             raise HTTPException(

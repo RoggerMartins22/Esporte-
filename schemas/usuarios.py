@@ -37,6 +37,9 @@ class ValidatePasswordRequest(BaseModel):
 class NomeUpdate(BaseModel):
     nome: str 
 
+class EmailUpdate(BaseModel):
+    email: str
+
 class UserOut(UserBase):
     id: int
 

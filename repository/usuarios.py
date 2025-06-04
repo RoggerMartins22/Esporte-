@@ -45,7 +45,7 @@ class UserRepository:
             raise e
     
     @staticmethod
-    def update_user_name(db: Session, user: User):
+    def update_user_date(db: Session, user: User):
         try:
             db.commit()
             db.refresh(user)
