@@ -60,7 +60,7 @@ class AgendamentoService:
     @staticmethod
     def criar_agendamento(db: Session, agendamento, user_id: int): 
          
-        user = UserRepository.get_role_user(db=db, id_usuario=user_id)
+        user = UserRepository.get_info_user(db=db, id_usuario=user_id)
         
         id_usuario_agendamento = agendamento.id_usuario or user_id 
         agendamento.id_usuario=id_usuario_agendamento
@@ -93,7 +93,7 @@ class AgendamentoService:
     @staticmethod
     def renovar_agendamento(db: Session, id_agendamento: int, nova_data: AgendamentoRenovarRequest, user_id: int):
 
-        user = UserRepository.get_role_user(db=db, id_usuario=user_id)
+        user = UserRepository.get_info_user(db=db, id_usuario=user_id)
         agendamento_antigo = AgendamentoRepository.get_agendamento_by_id(db, id_agendamento)
 
         if not agendamento_antigo:
@@ -158,7 +158,7 @@ class AgendamentoService:
     @staticmethod
     def listar_agendamentos(db: Session, user_id: int):
         try:
-            user = UserRepository.get_role_user(db=db, id_usuario=user_id)
+            user = UserRepository.get_info_user(db=db, id_usuario=user_id)
             
             if user.permissao == "ADM":
                 agendamentos = AgendamentoRepository.get_agendamentos(db=db)
@@ -183,7 +183,7 @@ class AgendamentoService:
     @staticmethod
     def listar_agendamento(db: Session, id_agendamento: int, user_id: int):
         try:
-            user = UserRepository.get_role_user(db=db, id_usuario=user_id)
+            user = UserRepository.get_info_user(db=db, id_usuario=user_id)
             agendamento = AgendamentoRepository.get_agendamento_detalhado_by_id(db=db, id_agendamento=id_agendamento)
             
             if not agendamento:
@@ -211,7 +211,7 @@ class AgendamentoService:
     def listar_agendamentos_por_id_quadra(db: Session, id_quadra: int, user_id: int):
         try:
 
-            user = UserRepository.get_role_user(db=db, id_usuario=user_id)
+            user = UserRepository.get_info_user(db=db, id_usuario=user_id)
             
             if user.permissao == "ADM":
                 agendamentos = AgendamentoRepository.get_agendamento_by_id_quadra(db=db, id_quadra=id_quadra)
@@ -239,7 +239,7 @@ class AgendamentoService:
     @staticmethod
     def listar_agendamentos_por_id_usuario(db: Session, id_usuario: int, user_id: int):
         try:
-            user = UserRepository.get_role_user(db=db, id_usuario=user_id)
+            user = UserRepository.get_info_user(db=db, id_usuario=user_id)
             
             if user.permissao == "ADM":
                 agendamentos = AgendamentoRepository.get_agendamento_by_id_usuario(db=db, id_usuario=id_usuario)
@@ -268,7 +268,7 @@ class AgendamentoService:
     @staticmethod
     def cancelar_agendamento(db: Session, id_agendamento: int, user_id: int):
         try:
-            user = UserRepository.get_role_user(db=db, id_usuario=user_id)
+            user = UserRepository.get_info_user(db=db, id_usuario=user_id)
             agendamento = AgendamentoRepository.get_agendamento_by_id(db=db, id_agendamento=id_agendamento)
             
             if not agendamento:

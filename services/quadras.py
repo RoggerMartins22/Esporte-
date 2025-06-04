@@ -27,7 +27,7 @@ class QuadrantService:
     @staticmethod
     def create_quadrant_service(db: Session, quadra: QuadraCreate, user_id: int):
 
-        user = UserRepository.get_role_user(db=db, id_usuario=user_id)
+        user = UserRepository.get_info_user(db=db, id_usuario=user_id)
         
         if user.permissao == "USER":
             raise HTTPException(
@@ -68,7 +68,7 @@ class QuadrantService:
     @staticmethod
     def update_quadrant(db: Session, id_quadra, quadra, user_id: int):
         
-        user = UserRepository.get_role_user(db=db, id_usuario=user_id)
+        user = UserRepository.get_info_user(db=db, id_usuario=user_id)
         
         if user.permissao == "USER":
             raise HTTPException(
@@ -94,7 +94,7 @@ class QuadrantService:
     @staticmethod
     def get_quadrant(db: Session, user_id: int):
 
-        user = UserRepository.get_role_user(db=db, id_usuario=user_id)
+        user = UserRepository.get_info_user(db=db, id_usuario=user_id)
 
         if user.permissao == "ADM":
             
