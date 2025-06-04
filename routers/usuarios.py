@@ -46,7 +46,3 @@ async def consulta_dados_usuarios(db: Session = Depends(get_db), user_id = Depen
 @routerUser.post("/alterar-nome")
 async def alterar_nome_usuario(nome: NomeUpdate, db: Session = Depends(get_db), user_id = Depends(get_current_user_id)):
     return UserService.update_nome_usuario(db=db, nome=nome, user_id=user_id)
-
-@router.get("/ping")
-async def ping():
-    return {"message": "pong"}

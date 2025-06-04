@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import usuarios, quadras, agendamentos
+from routers import usuarios, quadras, agendamentos, ping
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
@@ -21,6 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(ping.router)
 app.include_router(usuarios.router)
 app.include_router(usuarios.routerUser)
 app.include_router(quadras.router)
