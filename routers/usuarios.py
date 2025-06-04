@@ -42,3 +42,7 @@ async def confirmar_nova_senha(token: str, nova_senha: ValidatePasswordRequest, 
 @routerUser.get("/")
 async def consulta_dados_usuarios(db: Session = Depends(get_db), user_id = Depends(get_current_user_id)):
     return consulta_info_usuarios(db=db,  user_id=user_id)
+
+@router.get("/ping")
+async def ping():
+    return {"message": "pong"}
