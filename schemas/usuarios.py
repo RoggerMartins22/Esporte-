@@ -20,6 +20,12 @@ class UserCreate(UserBase):
 class LoginRequest(BaseModel):
     cpf: str
     senha: str
+
+class UserInfoResponse(BaseModel):
+    id: int
+    cpf: str
+    nome: str
+    email: str
     
 class ResetPasswordRequest(BaseModel):
     cpf: str

@@ -55,26 +55,8 @@ class UserRepository:
             raise e
 
     @staticmethod
-    def get_role_user(db: Session, id_usuario: int):
+    def get_info_user(db: Session, id_usuario: int):
         return db.query(User).filter(User.id == id_usuario).first()
-    
-    @staticmethod
-    def get_info_user(db: Session, id_usuario: int) -> dict | None:
-        result = db.query(
-            User.id,
-            User.cpf,
-            User.nome,
-            User.email
-        ).filter(User.id == id_usuario).first()
-
-        if result:
-            return {
-                "id": result.id,
-                "cpf": result.cpf,
-                "nome": result.nome,
-                "email": result.email,
-            }
-        return None
 
     @staticmethod
     def save_token(db, token, email, expiration):

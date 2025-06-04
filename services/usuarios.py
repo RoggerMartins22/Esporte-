@@ -5,7 +5,7 @@ from repository.usuarios import UserRepository
 from auth.hashing import AuthHandler
 from auth.auth import OAuth2
 from auth.token_handler import generate_expiration, generate_token
-from schemas.usuarios import UserCreate, LoginRequest, ResetPasswordRequest, ValidatePasswordRequest, NomeUpdate
+from schemas.usuarios import UserCreate, LoginRequest, UserInfoResponse, ResetPasswordRequest, ValidatePasswordRequest, NomeUpdate
 from mails.sendMail import send_email, send_email_reset_password
 from datetime import datetime, timezone
 import re
@@ -153,16 +153,18 @@ class UserService:
         
     @staticmethod
     def consulta_info_usuarios(db: Session, user_id: int):
-
         user = UserRepository.get_info_user(db=db, id_usuario=user_id)
-        
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Usuário não encontrado."
             )
-        
-        return user
+        return UserInfoResponse(
+            id=user.id,
+            cpf=user.cpf,
+            nome=user.nome,
+            email=user.email
+        )
 
     def update_nome_usuario(db: Session, nome: NomeUpdate, user_id: int):
         print(type(nome))
@@ -172,7 +174,7 @@ class UserService:
                 detail="Nome inválido. Deve conter apenas letras."
             )
 
-        user = UserRepository.get_role_user(db=db, id_usuario=user_id)
+        user = UserRepository.get_info_user(db=db, id_usuario=user_id)
         
         if not user:
             raise HTTPException(
