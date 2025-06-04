@@ -34,16 +34,26 @@ class UserRepository:
         return db.query(User).filter(User.email == user.email, User.cpf == user.cpf).first()
     
     @staticmethod
-    def update_user_password(db: Session, user_db):
+    def update_user_password(db: Session, user: User):
 
         try:
             db.commit()
-            db.refresh(user_db)
-            return user_db
+            db.refresh(user)
+            return user
         except IntegrityError as e:
             db.rollback()
             raise e
     
+    @staticmethod
+    def update_user_name(db: Session, user: User):
+        try:
+            db.commit()
+            db.refresh(user)
+            return user
+        except IntegrityError as e:
+            db.rollback()
+            raise e
+
     @staticmethod
     def get_role_user(db: Session, id_usuario: int):
         return db.query(User).filter(User.id == id_usuario).first()

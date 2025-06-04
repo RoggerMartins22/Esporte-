@@ -28,6 +28,9 @@ class ResetPasswordRequest(BaseModel):
 class ValidatePasswordRequest(BaseModel):
     nova_senha: str
 
+class NomeUpdate(BaseModel):
+    nome: str 
+
 class UserOut(UserBase):
     id: int
 
