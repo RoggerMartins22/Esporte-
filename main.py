@@ -21,8 +21,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(ping.router)
 app.include_router(usuarios.router)
 app.include_router(usuarios.routerUser)
 app.include_router(quadras.router)
 app.include_router(agendamentos.router)
+app.include_router(ping.router)
+
