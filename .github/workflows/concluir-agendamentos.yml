@@ -1,0 +1,17 @@
+name: Atualizar agendamentos expirados
+
+on:
+  schedule:
+    - cron: '0 */1 * * *'  # a cada 1 horas
+  workflow_dispatch:        # permite rodar manualmente
+
+jobs:
+  update-agendamentos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Rodar função concluir_agendamentos_expirados no Supabase
+        run: |
+          curl -X POST ${{ secrets.SUPABASE_URL }}/rest/v1/rpc/concluir_agendamentos_expirados \
+            -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Content-Type: application/json"
